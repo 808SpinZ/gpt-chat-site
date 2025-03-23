@@ -6,8 +6,11 @@ export default async function handler(req, res) {
   const { message } = req.body;
 
   if (!message || typeof message !== "string") {
+    console.error("Invalid message received:", message);
     return res.status(400).json({ error: "Invalid message format." });
   }
+
+  console.log("Incoming user message:", message);
 
   try {
     const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -27,8 +30,10 @@ export default async function handler(req, res) {
 
     const data = await openaiRes.json();
 
+    console.log("OpenAI raw response:", JSON.stringify(data, null, 2));
+
     if (data.error) {
-      console.error("OpenAI API Error:", data.error);
+      console.error("OpenAI API Error:", JSON.stringify(data.error, null, 2));
       return res.status(500).json({ error: "OpenAI API error." });
     }
 
