@@ -13,19 +13,28 @@ async function sendMessage() {
   chatbox.innerHTML += `<p><em>GPT is thinking...</em></p>`;
   chatbox.scrollTop = chatbox.scrollHeight;
 
-  // Send message to your backend API (which calls OpenAI securely)
-  const response = await fetch("/api/chat", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ message: userText })
-  });
+  try {
+    // Send message to backend API
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: userText })
+    });
 
-  const data = await response.json();
-  const reply = data.reply;
+    const data = await response.json();
 
-  // Show GPT reply
-  chatbox.innerHTML += `<p><strong>GPT:</strong> ${reply}</p>`;
+    if (data.reply) {
+      chatbox.innerHTML += `<p><strong>GPT:</strong> ${data.reply}</p>`;
+    } else {
+      chatbox.innerHTML += `<p><strong>GPT:</strong> Something went wrong. Try again.</p>`;
+    }
+
+  } catch (error) {
+    console.error("Error:", error);
+    chatbox.innerHTML += `<p><strong>GPT:</strong> Error contacting server.</p>`;
+  }
+
   chatbox.scrollTop = chatbox.scrollHeight;
 }
